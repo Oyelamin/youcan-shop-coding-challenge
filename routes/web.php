@@ -14,5 +14,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    dd("Running API Service...");
+   echo "Running api service...";
 });
