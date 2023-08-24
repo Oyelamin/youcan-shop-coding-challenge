@@ -64,13 +64,6 @@ abstract class BaseControllerConfig extends Controller
 
     }
 
-    /**
-     * @return User
-     */
-    protected function getAuth(): User {
-        return JWTAuth::user();
-    }
-
     protected function generateJWTToken(User $user): string {
         return JWTAuth::fromUser($user);
     }
