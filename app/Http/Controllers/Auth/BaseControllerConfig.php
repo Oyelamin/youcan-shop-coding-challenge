@@ -56,6 +56,7 @@ abstract class BaseControllerConfig extends Controller
 
             return $user;
         }catch (\Exception $e) {
+            dd($e->getMessage());
             Log::error($e->getMessage()); // For debugging
             throw new AuthenticationException(
                 message: "Something went wrong while processing your request. Kindly try again later"
@@ -90,6 +91,7 @@ abstract class BaseControllerConfig extends Controller
 
             return $user;
         }catch (\Exception $e){
+            dd($e->getMessage());
             Log::error($e->getMessage()); // For debugging
             throw new AuthenticationException(
                 message: "Something went wrong while processing your request. Kindly try again later"

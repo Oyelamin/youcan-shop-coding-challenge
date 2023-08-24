@@ -30,10 +30,13 @@ class UserLoginTest extends TestCase
             ->andReturn($this->faker->text);
 
         // Perform the API call
-        $this
+        $check = $this
             ->postJson(route('api.auth.login'), [
                 'oAuthToken'    => $this->faker->text
-            ])->assertSuccessful()
+            ]);
+        dd($check);
+
+        $this->assertSuccessful()
             ->assertJsonStructure([
                 'message',
                 'status',
