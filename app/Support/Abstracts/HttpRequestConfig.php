@@ -30,9 +30,9 @@ abstract class HttpRequestConfig
     /**
      * @return PromiseInterface|Response
      */
-    protected function get(): PromiseInterface|Response
+    protected function get($param = []): PromiseInterface|Response
     {
-        return Http::withHeaders($this->setRequestHeader())->get($this->requestURL);
+        return Http::withHeaders($this->setRequestHeader())->get($this->requestURL, $param);
     }
 
 

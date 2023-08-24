@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginApiRequest;
-use App\Models\User;
-use App\Services\GitHubApiService;
 use App\Support\Traits\ResponseTrait;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
 
 class UserAuthController extends BaseControllerConfig
 {

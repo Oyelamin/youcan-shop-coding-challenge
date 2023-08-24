@@ -17,3 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'auth'], function() {
     Route::post('/login', [\App\Http\Controllers\Auth\UserAuthController::class, 'login'])->name('api.auth.login');
 });
+
+Route::group(['middleware' => ['api.auth']], function () {
+    Route::group(['prefix' => 'repositories'], function() {
+        Route::get('', [\App\Http\Controllers\Repository\RepositoriesController::class, 'index'])->name('api.repositories.index');
+    });
+
+});
