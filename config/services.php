@@ -31,4 +31,6 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'google_api_base_url' => env("GOOGLE_API_BASE_URL", "https://api.github.com")
+
 ];
