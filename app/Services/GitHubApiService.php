@@ -10,9 +10,9 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Support\Abstracts\HttpRequestConfig;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Http;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Collection;
 
 class GitHubApiService extends HttpRequestConfig
 {
@@ -22,12 +22,21 @@ class GitHubApiService extends HttpRequestConfig
 
     protected readonly User $user;
 
-    public readonly array $userDetailResult;
+    public readonly array $response;
+
+    public int $page = 1;
+    public int $perPage = 20;
+
 
     public function __construct() {
         $this->baseUrl = config('services.google_api_base_url');
     }
 
+    /**
+     * Set Github request header
+     *
+     * @return string[]
+     */
     protected function setRequestHeader(): array {
         return [
             'Accept' => 'application/vnd.github.v3+json',
@@ -48,15 +57,50 @@ class GitHubApiService extends HttpRequestConfig
         $response = $this->get();
 
         if ($response->successful()) {
-            $this->userDetailResult = $response->json();
+            $this->response = $response->json();
 
             return $this;
         }
         return null;
     }
 
+    /**
+     * Get username from github response
+     *
+     * @return string
+     */
     public function getUsername(): string {
-        return $this->userDetailResult['login'];
+        return $this->response['login'];
+    }
+
+
+    /**
+     * Get authenticated user repositories
+     *
+     * @return Collection|null
+     */
+    public function getUserRepositories(): Collection|null
+    {
+        $user = $this->getAuth();
+        $this->token = Crypt::decryptString($user->password);
+        $this->requestURL = "{$this->baseUrl}/users/{$user->username}/repos";
+        $response = $this->get([
+            'page' => $this->page,
+            'per_page' => $this->perPage
+        ]);
+        if ($response->successful()) {
+            return collect($response->json());
+        }
+        return null;
+    }
+
+    /**
+     * Get authenticated user detail
+     *
+     * @return User
+     */
+    public function getAuth(): User {
+        return JWTAuth::user();
     }
 
 }

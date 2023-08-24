@@ -2,11 +2,11 @@
 
 namespace App\Support\Traits;
 
-use Illuminate\Contracts\Pagination\CursorPaginator;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 
 trait ResponseTrait
 {
@@ -16,13 +16,6 @@ trait ResponseTrait
      * @var string
      */
     protected string $resourceItem;
-
-    /**
-     * The current path of collection resource to respond
-     *
-     * @var string
-     */
-    protected string $resourceCollection;
 
     /**
      * @param mixed $data
@@ -106,16 +99,22 @@ trait ResponseTrait
     }
 
     /**
-     *
      * Return collection response from the application
+     *
+     * @param Collection|array $collection
+     * @return mixed
      */
-    protected function respondWithCollection(LengthAwarePaginator|CursorPaginator $collection)
+    protected function respondWithCollection(Collection|array $collection): AnonymousResourceCollection
     {
-        return (new $this->resourceCollection($collection))->additional(
+        return $this->resourceItem::collection($collection)->additional(
             [
                 'message' => __("Success"),
                 'status' => Response::HTTP_OK,
-                'meta' => ['timestamp' => $this->getTimestampInMilliseconds()]
+                'meta' => [
+                    'timestamp' => $this->getTimestampInMilliseconds(),
+                    'current_page' => request('page') ?? 1,
+                    'per_page' => request('limit') ?? 20
+                ]
             ]
         );
     }
