@@ -22,7 +22,9 @@ class RepositoriesController extends BaseControllerConfig
             $this->gitHubApi->page = $page;
             $this->gitHubApi->perPage = $perPage;
             $repositories = $this->gitHubApi->getUserRepositories();
-            return $this->respondWithCollection($repositories);
+            return $this->respondWithCollection(
+                collection: $repositories
+            );
 
         }catch(\Exception $e) {
             return $this->respondWithError(
@@ -33,9 +35,18 @@ class RepositoriesController extends BaseControllerConfig
     }
 
     public function show(Request $request, $repository) {
-        $repository = $this->gitHubApi->getUserRepository(
-            name: $repository
-        );
-        return $this->respondWithItem($repository);
+        try{
+            $repository = $this->gitHubApi->getUserRepository(
+                name: $repository
+            );
+            return $this->respondWithItem(
+                item: $repository
+            );
+        }catch(\Exception $e) {
+            return $this->respondWithError(
+                status_code: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+
     }
 }
