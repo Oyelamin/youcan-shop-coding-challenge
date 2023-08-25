@@ -31,4 +31,11 @@ class RepositoriesController extends BaseControllerConfig
         }
 
     }
+
+    public function show(Request $request, $repository) {
+        $repository = $this->gitHubApi->getUserRepository(
+            name: $repository
+        );
+        return $this->respondWithItem($repository);
+    }
 }

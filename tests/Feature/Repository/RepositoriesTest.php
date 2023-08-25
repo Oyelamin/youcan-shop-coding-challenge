@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class RepositoriesTest extends TestCase
 {
-    use AttachJwtToken;
+    use AttachJwtToken, WithFaker;
 
     private User $user;
 
@@ -32,6 +32,26 @@ class RepositoriesTest extends TestCase
             ->once()->andReturn(collect($expectedResponse));
         $response = $this->actingAs($this->user)->getJson(route('api.repositories.index'))
             ->assertSuccessful()
+            ->assertJsonStructure([
+                'message',
+                'status',
+                'data',
+                'meta',
+            ]);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_can_show_repository_details(){
+        $mockedService = $this->mock(GitHubApiService::class);
+        $expectedResponse = [];
+        $mockedService->shouldReceive('getUserRepository')
+            ->once()->andReturn($expectedResponse);
+        $response = $this->actingAs($this->user)->getJson(
+            route('api.repositories.show', [
+                'repository' => $this->faker->slug
+            ])
+        )->assertSuccessful()
             ->assertJsonStructure([
                 'message',
                 'status',
