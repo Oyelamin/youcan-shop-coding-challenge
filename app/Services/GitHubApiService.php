@@ -18,11 +18,11 @@ class GitHubApiService extends HttpRequestConfig
 {
     protected readonly string $baseUrl;
 
-    public string $token;
+    public string|null $token;
 
-    protected readonly User $user;
+    protected User|null $user;
 
-    public readonly array $response;
+    public readonly array|null $response;
 
     public int $page = 1;
     public int $perPage = 20;
@@ -30,6 +30,8 @@ class GitHubApiService extends HttpRequestConfig
 
     public function __construct() {
         $this->baseUrl = config('services.google_api_base_url');
+        $this->getAuth();
+
     }
 
     /**
@@ -81,9 +83,7 @@ class GitHubApiService extends HttpRequestConfig
      */
     public function getUserRepositories(): Collection|null
     {
-        $user = $this->getAuth();
-        $this->token = Crypt::decryptString($user->password);
-        $this->requestURL = "{$this->baseUrl}/users/{$user->username}/repos";
+        $this->requestURL = "{$this->baseUrl}/users/{$this->user->username}/repos";
         $response = $this->get([
             'page' => $this->page,
             'per_page' => $this->perPage
@@ -97,10 +97,13 @@ class GitHubApiService extends HttpRequestConfig
     /**
      * Get authenticated user detail
      *
-     * @return User
+     * @return User|null
      */
-    public function getAuth(): User {
-        return JWTAuth::user();
+    public function getAuth(): User|null {
+        $user = JWTAuth::user();
+        $this->user = $user;
+        $this->token = $user ? Crypt::decryptString($user?->password) : null;
+        return $this->user;
     }
 
     /**
@@ -108,11 +111,32 @@ class GitHubApiService extends HttpRequestConfig
      * @param $name
      * @return array|null
      */
-    public function getUserRepository($name): array|null{
-        $user = $this->getAuth();
-        $this->token = Crypt::decryptString($user->password);
-        $this->requestURL = "{$this->baseUrl}/repos/{$user->username}/{$name}";
+    public function getUserRepository(string $name): array|null
+    {
+        $this->requestURL = "{$this->baseUrl}/repos/{$this->user->username}/{$name}";
         $response = $this->get();
+        if ($response->successful()) {
+            return $response->json();
+        }
+        return null;
+    }
+
+    public function getRepositoryPullRequests(string $repository, string $state) {
+        $this->requestURL = "{$this->baseUrl}/repos/{$this->user->username}/{$repository}/pulls";
+        $response = $this->get([
+            'state' => $state
+        ]);
+
+        if ($response->successful()) {
+            return $response->json();
+        }
+        return null;
+    }
+
+    public function getRepositoryPullRequestReviews(string $repository, int $prNumber) {
+        $this->requestURL = "{$this->baseUrl}/repos/{$this->user->username}/{$repository}/pulls/{$prNumber}/reviews";
+        $response = $this->get();
+
         if ($response->successful()) {
             return $response->json();
         }
