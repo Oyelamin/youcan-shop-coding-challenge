@@ -106,6 +106,7 @@ To get started with the YouCan Coding Challenge, follow these steps:
 
 1.  Clone the repository to your local machine.
 2.  Set up the necessary environment and dependencies. You can check the [deployment script](https://github.com/Oyelamin/youcan-shop-coding-challenge/blob/main/.github/workflows/app-deployment.yml) for more info...
+3. Make sure you run `php artisan jwt:secret` to generate jwt token.
 3.  Configure your GitHub Personal Access Token (PAT) for authentication in the provided endpoint.
 4.  Implement the tasks outlined in the challenge.
 
