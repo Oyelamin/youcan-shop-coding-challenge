@@ -103,4 +103,20 @@ class GitHubApiService extends HttpRequestConfig
         return JWTAuth::user();
     }
 
+    /**
+     * Get a single repository detail
+     * @param $name
+     * @return array|null
+     */
+    public function getUserRepository($name): array|null{
+        $user = $this->getAuth();
+        $this->token = Crypt::decryptString($user->password);
+        $this->requestURL = "{$this->baseUrl}/repos/{$user->username}/{$name}";
+        $response = $this->get();
+        if ($response->successful()) {
+            return $response->json();
+        }
+        return null;
+    }
+
 }
