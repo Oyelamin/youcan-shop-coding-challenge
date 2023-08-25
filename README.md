@@ -1,66 +1,118 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# YouCan Coding Challenge: GitHub Leaders Board
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+The YouCan Coding Challenge involves creating a leaders board for contributors to a GitHub repository using the GitHub API. The challenge includes various tasks to be accomplished by the user.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1.  **List User Repositories:**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+    As a user, you have the ability to list your GitHub repositories.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+2.  **Select Repository:**
 
-## Learning Laravel
+    Users can select a repository from the list of their repositories.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3.  **Display User Leaderboard:**
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+    You can view the list of users participating in the selected repository, sorted by the number of PRs (Pull Requests) reviewed.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+4.  **Stats Duration:**
 
-## Laravel Sponsors
+    The leaderboard contains statistics for the last month, and the duration of the statistics can be easily customized.
+## Postman Documentation
+I have published a postman documentation for this task. Kindly click [HERE](https://documenter.getpostman.com/view/23410509/2s9Y5YR2Et) to access it.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
 
-### Premium Partners
+## Authentication
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+Authentication is a crucial aspect of the YouCan Coding Challenge. An authorization token is generated to ensure the security of the OAuth token obtained from GitHub. It's important to set an expiration for the token to enhance security.
 
-## Contributing
+## API Endpoints
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Login
 
-## Code of Conduct
+This endpoint is used to log in and obtain an authentication token for accessing the GitHub API.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Request:**
 
-## Security Vulnerabilities
+-   Method: POST
+-   Endpoint: [http://127.0.0.1:8000/api/auth/login](http://127.0.0.1:8000/api/auth/login)
+-   Body: formdata
+    -   `oAuthToken`: GitHub Personal Access Token (PAT)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Please ensure that you set your GitHub Personal Access Token (PAT) for authentication.
 
-## License
+## Repositories
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This section provides information about the endpoint to list repositories. You can use this endpoint to retrieve a list of repositories with specific pagination parameters.
+
+## API Endpoints
+### List Repositories
+
+This endpoint allows you to retrieve a list of repositories.
+
+**Request:**
+
+-   Method: GET
+-   Endpoint: [http://127.0.0.1:8000/api/repositories?page=1&limit=20](http://127.0.0.1:8000/api/repositories?page=1&limit=20)
+-   Authorization: Bearer Token
+-   Token: `<Your Bearer Token>`
+-   Params:
+    -   `page`: 1 (Page number)
+    -   `limit`: 20 (Number of items per page)
+
+Replace `<Your Bearer Token>` with your actual bearer token obtained from authentication.
+
+### Get Repository Details
+
+This endpoint allows you to retrieve detailed information about a specific repository.
+
+**Request:**
+
+-   Method: GET
+-   Endpoint: [http://127.0.0.1:8000/api/repositories/{repository-name}](http://127.0.0.1:8000/api/repositories/%7Brepository-name%7D)
+-   Authorization: Bearer Token
+-   Token: `<Your Bearer Token>`
+
+Replace `<Your Bearer Token>` with your actual bearer token obtained from authentication, and replace `{repository-name}` with the name of the repository for which you want to retrieve details.
+
+## Repository Leaderboard
+
+This section provides information about the endpoint to retrieve a leaderboard for a specific repository's contributors. You can use this endpoint to obtain a leaderboard of contributors based on various filters.
+
+### Get Repository Leaderboard
+
+This endpoint allows you to retrieve a leaderboard of contributors for a specific repository.
+
+**Request:**
+
+-   Method: GET
+-   Endpoint: [http://127.0.0.1:8000/api/repositories/{repository-name}/leaderboard](http://127.0.0.1:8000/api/repositories/%7Brepository-name%7D/leaderboard)
+-   Authorization: Bearer Token
+-   Token: `<Your Bearer Token>`
+-   Params:
+    -   `username`: Oyelamin (Filter by username)
+    -   `min_review_count`: 0 (Minimum PR Review count filter)
+    -   `min_pr_count`: 1 (Minimum PR count filter)
+    -   `start_date`: 2022-01-01 (Start date for filtering, Example: 2022-01-01, Default: Last Month Date)
+    -   `end_date`: 2023-12-12 (End date for filtering, Example: 2023-12-12, Default: Last Month Date)
+    -   `pr_state`: closed (Options: [closed, open, all], Default: "open")
+
+Replace `<Your Bearer Token>` with your actual bearer token obtained from authentication, and replace `{repository-name}` with the name of the repository for which you want to retrieve details.
+
+## Getting Started
+
+To get started with the YouCan Coding Challenge, follow these steps:
+
+1.  Clone the repository to your local machine.
+2.  Set up the necessary environment and dependencies. You can check the [deployment script](https://github.com/Oyelamin/youcan-shop-coding-challenge/blob/main/.github/workflows/app-deployment.yml) for more info...
+3.  Configure your GitHub Personal Access Token (PAT) for authentication in the provided endpoint.
+4.  Implement the tasks outlined in the challenge.
+
+## Contributors
+
+-   [Oyelamin](https://github.com/Oyelamin) - Software Engineer
+
+## Contact
+
+For any inquiries or feedback, please contact [ajalablessing49@gmail.com](mailto:ajalablessing49@gmail.com).
