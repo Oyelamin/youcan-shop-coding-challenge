@@ -17,11 +17,7 @@ class RepositoriesController extends BaseControllerConfig
     public function index(Request $request): JsonResponse|AnonymousResourceCollection {
 
         try {
-            $page = $request->page ?? 1;
-            $perPage = $request->limit ?? 20;
-            $this->gitHubApi->page = $page;
-            $this->gitHubApi->perPage = $perPage;
-            $repositories = $this->gitHubApi->getUserRepositories();
+            $repositories = $this->findByFilters($request->toArray());
             return $this->respondWithCollection(
                 collection: $repositories
             );
