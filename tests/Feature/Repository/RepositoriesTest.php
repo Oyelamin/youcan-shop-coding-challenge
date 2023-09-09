@@ -12,7 +12,6 @@ use Tests\TestCase;
 class RepositoriesTest extends TestCase
 {
     use AttachJwtToken, WithFaker;
-
     private User $user;
 
     public function setUp(): void

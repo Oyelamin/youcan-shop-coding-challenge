@@ -9,29 +9,27 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Support\Abstracts\HttpRequestConfig;
-use Illuminate\Support\Facades\Crypt;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Collection;
 
 class GitHubApiService
 {
-    protected readonly string $baseUrl;
-
-    public string|null $token;
-
+    public ?string $token;
     protected User|null $user;
-
-    public readonly array|null $response;
-
+    public ?array $response = null;
     public int $page = 1;
     public int $perPage = 20;
+    protected string $baseUrl;
 
     public function __construct() {
         $this->baseUrl = config('services.google_api_base_url');
     }
 
-    public function getUserProfile(): GitHubApiService|null
+    /**
+     * Get user profile detail
+     *
+     * @return ?$this
+     */
+    public function getUserProfile(): ?GitHubApiService
     {
         $url = "{$this->baseUrl}/user";
         $response = getRequest(url: $url, token: $this->token);
@@ -45,18 +43,18 @@ class GitHubApiService
     /**
      * Get username from github response
      *
-     * @return string
+     * @return ?string
      */
-    public function getUsername(): string {
+    public function getUsername(): ?string {
         return $this->response['login'];
     }
 
     /**
      * Get authenticated user repositories
      *
-     * @return Collection|null
+     * @return ?array
      */
-    public function getUserRepositories(): array|null
+    public function getUserRepositories(): ?array
     {
         $user = getCurrentUser();
         $url = "{$this->baseUrl}/users/{$user->username}/repos";
@@ -72,10 +70,11 @@ class GitHubApiService
 
     /**
      * Get a single repository detail
-     * @param $name
-     * @return array|null
+     *
+     * @param string $name
+     * @return ?array
      */
-    public function getUserRepository(string $name): array|null
+    public function getUserRepository(string $name): ?array
     {
         $user = getCurrentUser();
         $url = "{$this->baseUrl}/repos/{$user->username}/{$name}";
@@ -86,26 +85,39 @@ class GitHubApiService
         return null;
     }
 
-    public function getRepositoryPullRequests(string $repository, string $state) {
-        $this->requestURL = "{$this->baseUrl}/repos/{$this->user->username}/{$repository}/pulls";
-        $response = $this->get([
+    /**
+     * Get user repository pull requests
+     *
+     * @param string $repository
+     * @param string $state
+     * @return ?array
+     */
+    public function getRepositoryPullRequests(string $repository, string $state): ?array {
+        $user = getCurrentUser();
+        $url = "{$this->baseUrl}/repos/{$user->username}/{$repository}/pulls";
+        $response = getRequest(url: $url, param: [
             'state' => $state
         ]);
-
         if ($response->successful()) {
             return $response->json();
         }
         return null;
     }
 
-    public function getRepositoryPullRequestReviews(string $repository, int $prNumber) {
-        $this->requestURL = "{$this->baseUrl}/repos/{$this->user->username}/{$repository}/pulls/{$prNumber}/reviews";
-        $response = $this->get();
-
+    /**
+     * Get user repository pull request reviews
+     *
+     * @param string $repository
+     * @param int $prNumber
+     * @return ?array
+     */
+    public function getRepositoryPullRequestReviews(string $repository, int $prNumber): ?array {
+        $user = getCurrentUser();
+        $url = "{$this->baseUrl}/repos/{$user->username}/{$repository}/pulls/{$prNumber}/reviews";
+        $response = getRequest(url: $url);
         if ($response->successful()) {
             return $response->json();
         }
         return null;
     }
-
 }

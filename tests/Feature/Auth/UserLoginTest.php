@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Helpers\AuthenticationsHelper;
 use App\Services\GitHubApiService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -16,18 +17,11 @@ class UserLoginTest extends TestCase
     public function testGitHubLogin(): void
     {
         // Mock the GitHubApiService
-        $mockedService = $this->mock(GitHubApiService::class);
+        $mockedHelper = $this->mock(AuthenticationsHelper::class);
 
         // Set expectations for the mocked service
-        $expectedProfile = ['login' => $this->faker->text];
-        $mockedService->shouldReceive('userDetailResult');
-        $mockedService->shouldReceive('getUsername');
-        $mockedService->shouldReceive('getUserProfile')
-            ->once()->andReturn($mockedService);
-        $mockedService->shouldReceive('userDetailResult')
-            ->andReturn($expectedProfile);
-        $mockedService->shouldReceive('getUsername')
-            ->andReturn($this->faker->text);
+        $mockedHelper->shouldReceive('verifyToken')->andReturn(new GitHubApiService());
+        $mockedHelper->shouldReceive('attemptLogin')->andReturn($this->faker->text);
 
         // Perform the API call
         $this
@@ -42,6 +36,5 @@ class UserLoginTest extends TestCase
                 ],
                 'meta',
             ]);
-
     }
 }
