@@ -31,14 +31,13 @@ class AuthenticationsHelper
      */
     public function attemptLogin(Request $request, ?GitHubApiService $gitHubServiceData): string
     {
-        session(['oAuthToken' => $request->oAuthToken]);
         $user = $this->createUserIfNeeded($gitHubServiceData);
-        return $this->generateJWTToken($user);
+        return $this->generateJWTToken($user, ['oAuthToken' => $request->oAuthToken]);
     }
 
-    private function generateJWTToken(User $user): string
+    private function generateJWTToken(User $user, array $customClaims = []): string
     {
-        return JWTAuth::fromUser($user);
+        return JWTAuth::claims($customClaims)->fromUser($user);
     }
 
     private function createUserIfNeeded(GitHubApiService $gitHubServiceData): User

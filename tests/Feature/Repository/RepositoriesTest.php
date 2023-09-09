@@ -29,7 +29,7 @@ class RepositoriesTest extends TestCase
         $mockedService = $this->mock(GitHubApiService::class);
         $expectedResponse = [];
         $mockedService->shouldReceive('getUserRepositories')
-            ->once()->andReturn(collect($expectedResponse));
+            ->once()->andReturn($expectedResponse);
         $response = $this->actingAs($this->user)->getJson(route('api.repositories.index'))
             ->assertSuccessful()
             ->assertJsonStructure([

@@ -51,35 +51,23 @@ class GitHubApiService
         return $this->response['login'];
     }
 
-
     /**
      * Get authenticated user repositories
      *
      * @return Collection|null
      */
-    public function getUserRepositories(): Collection|null
+    public function getUserRepositories(): array|null
     {
-        $this->requestURL = "{$this->baseUrl}/users/{$this->user->username}/repos";
-        $response = $this->get([
+        $user = getCurrentUser();
+        $url = "{$this->baseUrl}/users/{$user->username}/repos";
+        $response = getRequest(url: $url, param: [
             'page' => $this->page,
             'per_page' => $this->perPage
         ]);
         if ($response->successful()) {
-            return collect($response->json());
+            return $response->json();
         }
         return null;
-    }
-
-    /**
-     * Get authenticated user detail
-     *
-     * @return User|null
-     */
-    public function getAuth(): User|null {
-        $user = JWTAuth::user();
-        $this->user = $user;
-        $this->token = $user ? Crypt::decryptString($user?->password) : null;
-        return $this->user;
     }
 
     /**
@@ -89,8 +77,9 @@ class GitHubApiService
      */
     public function getUserRepository(string $name): array|null
     {
-        $this->requestURL = "{$this->baseUrl}/repos/{$this->user->username}/{$name}";
-        $response = $this->get();
+        $user = getCurrentUser();
+        $url = "{$this->baseUrl}/repos/{$user->username}/{$name}";
+        $response = getRequest(url: $url);
         if ($response->successful()) {
             return $response->json();
         }
