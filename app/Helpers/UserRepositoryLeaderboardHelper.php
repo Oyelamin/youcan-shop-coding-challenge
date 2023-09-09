@@ -1,37 +1,56 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: blessing
+ * Date: 09/09/2023
+ * Time: 4:08 am
+ */
 
-namespace App\Http\Controllers\User\Traits;
+namespace App\Helpers;
 
 use App\Services\GitHubApiService;
 use Carbon\Carbon;
 
-trait UserRepositoryLeaderboardActionsTrait
+class UserRepositoryLeaderboardHelper
 {
-    // Modular Behavior
-
-    protected readonly string|null $usernameFilter;
-    protected readonly string|null $minReviewCountFilter;
-    protected readonly string|null $minPRCountFilter;
-    protected string|null $startDateFilter;
-    protected string|null $endDateFilter;
-    protected readonly string $prStateFilter;
-
     protected GitHubApiService $gitHubApi;
-    protected string $repository;
+    public ?string $usernameFilter;
+    public ?string $minReviewCountFilter;
+    public ?string $minPRCountFilter;
+    public ?string $startDateFilter;
+    public ?string $endDateFilter;
+    public string $prStateFilter;
+    public string $repository;
 
     public function __construct(GitHubApiService $gitHubApi)
     {
         $this->gitHubApi = $gitHubApi;
-        $this->startDateFilter = Carbon::now()->subMonth()->startOfMonth();
-        $this->endDateFilter = Carbon::now()->subMonth()->endOfMonth();
     }
 
     /**
-     *  Leaderboard actions...
+     * Apply filters to the leaderboard.
+     *
+     * @param array $filterOptions
+     * @return UserRepositoryLeaderboardHelper
+     */
+    public function applyFilters(array $filterOptions = []): UserRepositoryLeaderboardHelper {
+        $startDateFilter = $filterOptions['start_date'] ?? null;
+        $endDateFilter = $filterOptions['end_date'] ?? null;
+        $this->prStateFilter = $filterOptions['pr_state'] ?? 'open';
+        $this->usernameFilter = $filterOptions['username'] ?? null;
+        $this->minReviewCountFilter = $filterOptions['min_review_count'] ?? 0;
+        $this->minPRCountFilter = $filterOptions['min_pr_count'] ?? 0;
+        $this->startDateFilter = $startDateFilter ? Carbon::parse($startDateFilter) : Carbon::now()->subMonth()->startOfMonth();
+        $this->endDateFilter = $endDateFilter ? Carbon::parse($endDateFilter) : Carbon::now()->subMonth()->endOfMonth();
+        return $this;
+    }
+
+    /**
+     * Fetch leaderboard records.
      *
      * @return array|null
      */
-    private function executeLeaderboardActions(): array|null{
+    public function fetchLeaderboardRecords(): ?array {
         $startDate = $this->startDateFilter;
         $endDate = $this->endDateFilter;
         $pullRequests = $this->gitHubApi->getRepositoryPullRequests(
@@ -40,6 +59,7 @@ trait UserRepositoryLeaderboardActionsTrait
         );
         $leaderboardData = [];
 
+        if(!$pullRequests) return [];
         foreach ($pullRequests as $pr) {
             $createdAt = Carbon::parse($pr['created_at']);
             if ($createdAt->between($startDate, $endDate)) {
@@ -49,9 +69,7 @@ trait UserRepositoryLeaderboardActionsTrait
                     prNumber: $prNumber
                 );
                 $prReviewCount = count($pullRequestReviews);
-
                 $prAuthor = $pr['user']['login'];
-
 
                 if (!isset($leaderboardData[$prAuthor])) {
                     $leaderboardData[$prAuthor] = [
@@ -59,13 +77,10 @@ trait UserRepositoryLeaderboardActionsTrait
                         'pr_count' => 0,
                     ];
                 }
-
                 $leaderboardData[$prAuthor]['pr_review_count'] += $prReviewCount;
                 $leaderboardData[$prAuthor]['pr_count']++;
-
             }
         }
-
 
         // Sort leaderboard data by PR review count, etc...
         return $this->applySort(
@@ -74,12 +89,12 @@ trait UserRepositoryLeaderboardActionsTrait
     }
 
     /**
-     * Apply sorting/filters to leaderboard data
+     * Apply sorting/filters to leaderboard data.
      *
-     * @param $leaderboardData
+     * @param array $leaderboardData
      * @return array
      */
-    private function applySort($leaderboardData): array {
+    private function applySort(array $leaderboardData): array {
         $usernameFilter = $this->usernameFilter;
         $minReviewCount = $this->minReviewCountFilter;
         $minPRCount = $this->minPRCountFilter;
@@ -110,7 +125,5 @@ trait UserRepositoryLeaderboardActionsTrait
                 'pr_count' => $value['pr_count']
             ];
         }, $leaderboardData, array_keys($leaderboardData));
-
     }
-
 }
