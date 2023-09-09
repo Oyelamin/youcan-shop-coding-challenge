@@ -12,7 +12,6 @@ use Tests\TestCase;
 class LeaderboardTest extends TestCase
 {
     use AttachJwtToken, WithFaker;
-
     private User $user;
 
     public function setUp(): void
@@ -32,7 +31,6 @@ class LeaderboardTest extends TestCase
             ->once()->andReturn($expectedResponse);
         $mockedService->shouldReceive('getRepositoryPullRequestReviews')
             ->andReturn($expectedResponse);
-
         $response = $this->actingAs($this->user)->getJson(route('api.repositories.leaderboard.index', [
                 'repository' => $this->faker->slug
             ])
@@ -45,7 +43,5 @@ class LeaderboardTest extends TestCase
             ]);
 
         $response->assertStatus(200);
-
-
     }
 }
