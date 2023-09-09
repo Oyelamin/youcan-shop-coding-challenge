@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Crypt;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Collection;
 
-class GitHubApiService extends HttpRequestConfig
+class GitHubApiService
 {
     protected readonly string $baseUrl;
 
@@ -27,40 +27,16 @@ class GitHubApiService extends HttpRequestConfig
     public int $page = 1;
     public int $perPage = 20;
 
-
     public function __construct() {
         $this->baseUrl = config('services.google_api_base_url');
-        $this->getAuth();
-
     }
 
-    /**
-     * Set Github request header
-     *
-     * @return string[]
-     */
-    protected function setRequestHeader(): array {
-        return [
-            'Accept' => 'application/vnd.github.v3+json',
-            'Authorization' => "Bearer {$this->token}",
-        ];
-
-    }
-
-
-    /**
-     *  Get the authenticated user
-     *
-     * @return array|mixed|null
-     */
     public function getUserProfile(): GitHubApiService|null
     {
-        $this->requestURL = "{$this->baseUrl}/user";
-        $response = $this->get();
-
+        $url = "{$this->baseUrl}/user";
+        $response = getRequest(url: $url, token: $this->token);
         if ($response->successful()) {
             $this->response = $response->json();
-
             return $this;
         }
         return null;
