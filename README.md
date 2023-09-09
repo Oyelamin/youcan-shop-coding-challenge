@@ -105,10 +105,14 @@ Replace `<Your Bearer Token>` with your actual bearer token obtained from authen
 To get started with the YouCan Coding Challenge, follow these steps:
 
 1.  Clone the repository to your local machine.
-2.  Set up the necessary environment and dependencies. You can check the [deployment script](https://github.com/Oyelamin/youcan-shop-coding-challenge/blob/main/.github/workflows/app-deployment.yml) for more info...
-3. Make sure you run `php artisan jwt:secret` to generate jwt token.
-3.  Configure your GitHub Personal Access Token (PAT) for authentication in the provided endpoint.
-4.  Implement the tasks outlined in the challenge.
+2.  Run `composer install`
+3. Run `cp .env.example .env`
+4. Run `php artisan key:generate & php artisan jwt:secret` to generate app key and jwt secrets
+5. Set up your database configurations in your `.env` file
+6. Run `php artisan migrate`
+7. Run `php artisan serve` to start the application
+8. Click [HERE](https://github.com/settings/tokens?type=beta) to generate your GitHub Personal Access Token (PAT) for authentication in the provided endpoints.
+9. Use the generated token to login to the API. This endpoint will generate a bearer token for you to use across all your requests in the application.
 
 ## Contributors
 
