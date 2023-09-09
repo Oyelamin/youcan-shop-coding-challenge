@@ -7,6 +7,7 @@
  */
 
 use Illuminate\Support\Facades\Http;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 /**
  * @param string $url
@@ -23,5 +24,10 @@ function getRequest(string $url, array $param = [], ?string $token = null): \Guz
 }
 
 function getTokenFromSession(): ?string {
-    return session('oAuthToken');
+    $token = request()->bearerToken();
+    return $token ? auth()->payload()->get(config('jwt.githubToken')) : null;
+}
+
+function getCurrentUser(): mixed {
+    return JWTAuth::user();
 }
